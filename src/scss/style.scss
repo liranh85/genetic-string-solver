@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+
+$BODY_PADDING: 20px;
+
+* {
+	box-sizing: border-box;
+}
+
+body, html {
+	overflow-x: hidden;
+}
+
+body, button {
+	font-family: 'Open Sans', sans-serif;
+}
+
+body {
+	margin: 0;
+	padding: $BODY_PADDING;
+}

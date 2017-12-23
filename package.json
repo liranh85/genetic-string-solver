@@ -1,0 +1,25 @@
+{
+  "name": "genetic-string-solver",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Liran",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-plugin-transform-async-functions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^5.0.0",
+    "gulp-sass": "^3.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "description": ""
+}
