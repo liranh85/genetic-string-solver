@@ -18,3 +18,55 @@ body {
 	margin: 0;
 	padding: $BODY_PADDING;
 }
+
+.main {
+	text-align: center;
+
+	.title {
+		margin: 15px 0 40px;
+	}
+
+	.target {
+		box-shadow: 0px 0px 15px 5px #555;
+		border: 0;
+		outline: none;
+		width: 500px;
+		height: 200px;
+		padding: 15px;
+		font-size: 15px;
+		margin: 0 0 20px;
+	}
+
+	.solve {
+		display: block;
+		margin: 0 auto;
+		background-color: #4ead4e;
+		border: 1px solid lighten(#4ead4e, 10);
+		// outline: none;
+		padding: 10px 30px;
+		font-size: 16px;
+		color: white;
+		cursor: pointer;
+
+		&:hover {
+			background-color: lighten(#4ead4e, 5);
+		}
+	}
+
+	.solution-table {
+		margin: 30px auto;
+
+		th, td {
+			text-align: left;
+			padding: 5px 10px;
+			max-width: 67vw;
+			vertical-align: top;
+			word-wrap: break-word;
+		}
+
+		.correct-solution {
+			background-color: #f7f75e;
+			font-weight: 600;
+		}
+	}
+}

@@ -59,7 +59,8 @@ gulp.task("watch", ["sass", "clean", "copy", "browserify"], function() {
 gulp.task("connect", function() {
 	connect.server({
 		root: "build",
-		livereload: true
+		livereload: true,
+		port: 8080
 	})
 })
 

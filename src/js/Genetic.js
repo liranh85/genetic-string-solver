@@ -13,7 +13,8 @@ class Genetic {
         this.population = [];
         this.currentGeneration = 0;
         this.fittestEntityEver = null;
-        this.paused = false,
+        this.paused = false;
+        this._next = this._next.bind(this);
         this._init();
     }
 
@@ -81,14 +82,19 @@ class Genetic {
         this._sortEntitiesByFittest();
         this._updateFitnessRecord();
         if (this.config.skip === 0 || this.currentGeneration % this.config.skip === 0) {
-            this.notification(this._stats());
+            Promise.resolve( this.notification(this._stats()) ).then(this._next);
+        } else {
+            this._next();
         }
-        this._next();
     }
 
     _next() {
         if (!this.paused) {
             if (this.isFinished(this._stats())) {
+                this.notification({
+                    ...this._stats(),
+                    isFinished: true
+                });
                 this._SimulationComplete();
             } else {
                 this._createNewGeneration();
@@ -102,7 +108,7 @@ class Genetic {
         let resolvedPromisesNum = 0;
         return new Promise((resolve, reject) => {
             this.population.forEach((entity, i) => {
-                this.fitness(entity.DNA, `entity${i}`).then((response) => {
+                Promise.resolve(this.fitness(entity.DNA, `entity${i}`)).then((response) => {
                     entity.fitness = response;
                     resolvedPromisesNum++;
                     if ((this.config.killTheWeak && resolvedPromisesNum === this.config.numberOfFittestToSelect) || resolvedPromisesNum === this.population.length) {
@@ -146,8 +152,10 @@ class Genetic {
     _createNewGeneration() {
         const createMutateAndAddNewborns = (DNA1, DNA2) => {
             let newbornsDNAs = this.crossover(DNA1, DNA2);
-            newbornsDNAs[0] = this.mutate(newbornsDNAs[0], this.config.mutationIterations);
-            newbornsDNAs[1] = this.mutate(newbornsDNAs[1], this.config.mutationIterations);
+            for (let i = 0; i < this.config.mutationIterations; i++) {
+                newbornsDNAs[0] = this.mutate(newbornsDNAs[0]);
+                newbornsDNAs[1] = this.mutate(newbornsDNAs[1]);
+            }
             this.population = this.population.concat(newbornsDNAs.map((newbornDNA) => {
                 return {
                     DNA: this._clone(newbornDNA),
@@ -181,7 +189,8 @@ class Genetic {
             population: this._clone(this.population),
             generation: this.currentGeneration,
             mean: this.getMeanFitness(),
-            fittestEver: this.fittestEntityEver
+            fittestEver: this.fittestEntityEver,
+            isFinished: false
         }
     }
 
