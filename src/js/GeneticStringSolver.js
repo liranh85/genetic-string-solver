@@ -131,7 +131,7 @@ class GeneticStringSolver {
 
         const genetic = new Genetic(this.settings);
 
-		genetic.evolve();
+		genetic.solve();
     }
 }
 

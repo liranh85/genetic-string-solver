@@ -23,7 +23,6 @@ class Genetic {
         if (this.initFunction) {
             this.initFunction();
         }
-        this._createFirstGeneration();
         if (this.config.pauseElm) {
             this._onPauseClicked = this._onPauseClicked.bind(this);
             this.config.pauseElm.addEventListener('click', this._onPauseClicked);
@@ -31,6 +30,16 @@ class Genetic {
         if (this.config.stopElm) {
             this._onStopClicked = this._onStopClicked.bind(this);
             this.config.stopElm.addEventListener('click', this._onStopClicked);
+        }
+    }
+
+    _initNumFittestToSelect() {
+        if (!this.config.numberOfFittestToSelect) {
+            // Default value is 2 if not set
+            this.config.numberOfFittestToSelect = 2;
+        } else if (this.config.numberOfFittestToSelect % 2 !== 0) {
+            // Must be an even number
+            this.config.numberOfFittestToSelect++;
         }
     }
 
@@ -49,42 +58,49 @@ class Genetic {
         }
     }
 
-    _initNumFittestToSelect() {
-        if (!this.config.numberOfFittestToSelect) {
-            // Default value is 2 if not set
-            this.config.numberOfFittestToSelect = 2;
-        } else if (this.config.numberOfFittestToSelect % 2 !== 0) {
-            // Must be an even number
-            this.config.numberOfFittestToSelect++;
+    async solve() {
+        try {
+            await this._createFirstGeneration();
+            this._evolve();
+        }
+        catch (e) {
+            console.error(e);
+            this._onStopClicked();
         }
     }
 
-    _createFirstGeneration() {
-        for (let i = 0; i < this.config.size; i++) {
-            this.population.push({
-                DNA: this.seed(),
-                fitness: this.config.initialFitness
-            });
+    async _createFirstGeneration() {
+        try {
+            for (let i = 0; i < this.config.size; i++) {
+                this.population.push({
+                    DNA: await this.seed(),
+                    fitness: this.config.initialFitness
+                });
+            }
+        }
+        catch (e) {
+            console.error(e);
+            this._simulationComplete();
         }
     }
 
-    async evolve() {
+    async _evolve() {
         try {
             await this._computePopulationFitness();
-        }
-        catch(e) {
-            console.error(e);
-            return;
-        }
-        if (this.config.killTheWeak) {
-            this._killTheWeak();
-        }
-        this._sortEntitiesByFittest();
-        this._updateFitnessRecord();
-        if (this.config.skip === 0 || this.currentGeneration % this.config.skip === 0) {
-            Promise.resolve( this.notification(this._stats()) ).then(this._next);
-        } else {
+            if (this.config.killTheWeak) {
+                this._killTheWeak();
+            }
+            this._sortEntitiesByFittest();
+            this._updateFitnessRecord();
+            // If notification is due
+            if (this.config.skip === 0 || this.currentGeneration % this.config.skip === 0) {
+                await this.notification(this._stats());
+            }
             this._next();
+        }
+        catch (e) {
+            console.error(e);
+            this._onStopClicked();
         }
     }
 
@@ -95,11 +111,11 @@ class Genetic {
                     ...this._stats(),
                     isFinished: true
                 });
-                this._SimulationComplete();
+                this._simulationComplete();
             } else {
                 this._createNewGeneration();
                 this.currentGeneration++;
-                this.evolve();
+                this._evolve();
             }
         }
     }
@@ -151,7 +167,7 @@ class Genetic {
 
     _createNewGeneration() {
         const createMutateAndAddNewborns = (DNA1, DNA2) => {
-            let newbornsDNAs = this.crossover(DNA1, DNA2);
+            const newbornsDNAs = this.crossover(DNA1, DNA2);
             for (let i = 0; i < this.config.mutationIterations; i++) {
                 newbornsDNAs[0] = this.mutate(newbornsDNAs[0]);
                 newbornsDNAs[1] = this.mutate(newbornsDNAs[1]);
@@ -194,7 +210,7 @@ class Genetic {
         }
     }
 
-    _SimulationComplete() {
+    _simulationComplete() {
         if (this.config.pauseElm) {
             this.config.pauseElm.removeEventListener('click', this._onPauseClicked);
         }
