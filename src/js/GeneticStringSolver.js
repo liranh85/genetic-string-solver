@@ -1,4 +1,4 @@
-import Genetic from './Genetic';
+import Genetic from 'genetic-lib';
 
 class GeneticStringSolver {
     constructor() {
