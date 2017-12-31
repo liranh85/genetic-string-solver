@@ -23,6 +23,6 @@
   },
   "description": "",
   "dependencies": {
-    "genetic-lib": "^1.0.0-beta.5"
+    "genetic-lib": "^1.0.0-beta.6"
   }
 }

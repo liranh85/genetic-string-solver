@@ -12,7 +12,6 @@ class GeneticStringSolver {
         this._fitness = this._fitness.bind(this);
         this._notification = this._notification.bind(this);
         this._isFinished = this._isFinished.bind(this);
-        this._onFinished = this._onFinished.bind(this);
     }
 
     init() {
@@ -94,8 +93,6 @@ class GeneticStringSolver {
         return stats.fittestEver.fitness === this.userData.solution.length;
     }
 
-    _onFinished(stats) {};
-
     _initFunction() {
         const resetSolutionTable = () => {
             const dataRows = document.querySelectorAll('#solution-table .data-row');
@@ -120,13 +117,12 @@ class GeneticStringSolver {
             config: {
                 size: 200,
                 mutationIterations: 1,
-                skip: 10,
+                skip: 5,
                 optimise: 'max',
                 initialFitness: 0,
                 numberOfFittestToSelect: 4
             },
-            isFinished: this._isFinished,
-            onFinished: this._onFinished
+            isFinished: this._isFinished
         };
 
         const genetic = new Genetic(this.settings);
