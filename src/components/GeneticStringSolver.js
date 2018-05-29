@@ -2,13 +2,15 @@ import Genetic from 'genetic-lib';
 
 class GeneticStringSolver {
   constructor () {
+    this.solveButton = document.getElementById('solve')
     this.settings = {}
     this.solution = null
   }
 
   init () {
-    document.getElementById('solve').addEventListener('click', () => {
+    this.solveButton.addEventListener('click', () => {
       this.solution = document.getElementById('target').value
+      this.solveButton.disabled = true
       this._run()
     })
   }
@@ -98,6 +100,10 @@ class GeneticStringSolver {
     return stats.fittestEver.fitness === this.solution.length
   }
 
+  _onFinished = () => {
+    this.solveButton.disabled = false
+  }
+
   _initFunction () {
     const resetSolutionTable = () => {
       const dataRows = document.querySelectorAll('#solution-table .data-row')
@@ -117,6 +123,7 @@ class GeneticStringSolver {
       fitness: this._fitness,
       notification: this._notification,
       isFinished: this._isFinished,
+      onFinished: this._onFinished,
       populationSize: 200,
       mutationIterations: 1,
       skip: 5,
