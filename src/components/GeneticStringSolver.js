@@ -1,16 +1,39 @@
-import Genetic from 'genetic-lib';
+import Genetic from 'genetic-lib'
 
 class GeneticStringSolver {
   constructor () {
-    this.solveButton = document.getElementById('solve')
-    this.settings = {}
+    this.settings = {
+      init: this._initSimulation,
+      seed: this._seed,
+      mutate: this._mutate,
+      crossover: this._crossover,
+      fitness: this._fitness,
+      notification: this._notification,
+      isFinished: this._isFinished,
+      onFinished: this._onFinished,
+      populationSize: 200,
+      mutationIterations: 1,
+      skip: 5,
+      optimise: 'max',
+      initialFitness: 0,
+      numberOfFittestToSelect: 4
+    }
     this.solution = null
+    this.elm = {
+      headerRow: document.getElementById('solution-table-header-row'),
+      solutionTable: document.getElementById('solution-table'),
+      solveButton: document.getElementById('solve')
+    }
+    this.css = {
+      correctSolution: 'correct-solution',
+      dataRow: 'data-row'
+    }
   }
 
   init () {
-    this.solveButton.addEventListener('click', () => {
+    this.elm.solveButton.addEventListener('click', () => {
       this.solution = document.getElementById('target').value
-      this.solveButton.disabled = true
+      this.elm.solveButton.disabled = true
       this._run()
     })
   }
@@ -40,9 +63,8 @@ class GeneticStringSolver {
   }
 
   _crossover (mother, father) {
-    const length = mother.length
-    let ca = Math.floor(Math.random() * length)
-    let cb = Math.floor(Math.random() * length)
+    let ca = Math.floor(Math.random() * mother.length)
+    let cb = Math.floor(Math.random() * mother.length)
 
     if (ca > cb) {
       let tmp = cb
@@ -71,29 +93,37 @@ class GeneticStringSolver {
   _notification = stats => {
     return new Promise((resolve, reject) => {
       window.setTimeout(() => {
-        const row = document.createElement('tr')
-        row.classList.add('data-row')
-        if (stats.isFinished) {
-          row.classList.add('correct-solution')
-        }
-        const generationCell = document.createElement('td')
-        generationCell.innerHTML = stats.generation
-        const fittestCell = document.createElement('td')
-        fittestCell.innerHTML = stats.fittestEver.DNA
-        const fitnessCell = document.createElement('td')
-        fitnessCell.innerHTML = `${(
-          stats.population[0].fitness /
-          this.solution.length *
-          100
-        ).toFixed(2)}%`
-        row.appendChild(generationCell)
-        row.appendChild(fittestCell)
-        row.appendChild(fitnessCell)
-        const headerRow = document.getElementById('solution-table-header-row')
-        headerRow.parentNode.insertBefore(row, headerRow.nextElementSibling)
+        const row = this._createRowFromStats(stats)
+        this.elm.headerRow.parentNode.insertBefore(
+          row,
+          this.elm.headerRow.nextElementSibling
+        )
         resolve()
       }, 0)
     })
+  }
+
+  _createRowFromStats (stats) {
+    const { css } = this
+    const row = document.createElement('tr')
+    row.classList.add(css.dataRow)
+    if (stats.isFinished) {
+      row.classList.add(css.correctSolution)
+    }
+    const generationCell = document.createElement('td')
+    generationCell.innerHTML = stats.generation
+    const fittestCell = document.createElement('td')
+    fittestCell.innerHTML = stats.fittestEver.DNA
+    const fitnessCell = document.createElement('td')
+    fitnessCell.innerHTML = `${(
+      stats.population[0].fitness /
+      this.solution.length *
+      100
+    ).toFixed(2)}%`
+    row.appendChild(generationCell)
+    row.appendChild(fittestCell)
+    row.appendChild(fitnessCell)
+    return row
   }
 
   _isFinished = stats => {
@@ -101,39 +131,24 @@ class GeneticStringSolver {
   }
 
   _onFinished = () => {
-    this.solveButton.disabled = false
+    this.elm.solveButton.disabled = false
   }
 
-  _initFunction () {
-    const resetSolutionTable = () => {
-      const dataRows = document.querySelectorAll('#solution-table .data-row')
-      for (let i = 0; i < dataRows.length; i++) {
-        dataRows[i].parentElement.removeChild(dataRows[i])
-      }
+  _initSimulation = () => {
+    this.resetSolutionTable()
+  }
+
+  resetSolutionTable () {
+    const dataRows = this.elm.solutionTable.getElementsByClassName(
+      this.css.dataRow
+    )
+    for (let i = 0; i < dataRows.length; i++) {
+      dataRows[i].parentElement.removeChild(dataRows[i])
     }
-    resetSolutionTable()
   }
 
   _run () {
-    this.settings = {
-      init: this._initFunction,
-      seed: this._seed,
-      mutate: this._mutate,
-      crossover: this._crossover,
-      fitness: this._fitness,
-      notification: this._notification,
-      isFinished: this._isFinished,
-      onFinished: this._onFinished,
-      populationSize: 200,
-      mutationIterations: 1,
-      skip: 5,
-      optimise: 'max',
-      initialFitness: 0,
-      numberOfFittestToSelect: 4
-    }
-
     const genetic = new Genetic(this.settings)
-
     genetic.solve()
   }
 }
