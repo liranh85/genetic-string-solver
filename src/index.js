@@ -119,11 +119,7 @@ const onFinished = () => {
   elm.solveButton.disabled = false
 }
 
-const initSimulation = () => {
-  resetSolutionTable()
-}
-
-function resetSolutionTable () {
+const resetSolutionTable = () => {
   const dataRows = elm.solutionTable.getElementsByClassName(css.dataRow)
   for (let i = 0; i < dataRows.length; i++) {
     dataRows[i].parentElement.removeChild(dataRows[i])
@@ -132,7 +128,7 @@ function resetSolutionTable () {
 
 function run () {
   const settings = {
-    init: initSimulation,
+    init: resetSolutionTable,
     seed: seed,
     mutate: mutate,
     crossover: crossover,
